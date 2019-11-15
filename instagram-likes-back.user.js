@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Instagram Likes Back
 // @namespace    instagram-likes-back
-// @version      0.0.2
+// @version      0.0.3
 // @description  See likes in Instagram again
 // @homepageURL  https://github.com/0xC0FFEEC0DE/instagram-likes-back
 // @supportURL   https://github.com/0xC0FFEEC0DE/instagram-likes-back/issues
@@ -16,13 +16,28 @@
     'use strict'
 
     let articleObserver = new MutationObserver(function(mutations) {
-        let articleMutations = Array.prototype.filter.call(mutations, m => m.target.className === 'PdwC2 _6oveC Z_y-9')
-        if (articleMutations.length === 0) return
+        //console.log(mutations)
+        let mutation = Array.prototype.filter.call(mutations, m => m.target.className === 'PdwC2 _6oveC Z_y-9')[0]
 
-        let article = selectArticle(articleMutations)
-        if (!article) return
+        if (!mutation) {
+            let t = Array.prototype.filter.call(mutations, m => m.target.nodeName === 'BODY')
+                .filter(m => m.addedNodes[0] && m.addedNodes[0].className === '_2dDPU vCf6V')
+            mutation = t[0] || null
+        }
 
+        if (!mutation) return
+        let article = selectArticle(mutation)
+        if (article) {
+            process(article)
+        }
+    }).observe(document.body, {
+        subtree: true,
+        childList: true,
+    })
+
+    function process(article) {
         let shortCode = getShortCode(article)
+        if (!shortCode) return
 
         requrestLikesCount(shortCode)
         .then(likes => {
@@ -31,21 +46,19 @@
         .catch(err => {
             console.error(err)
         })
-    }).observe(document.body, {
-        subtree: true,
-        childList: true,
-    })
+    }
 
     function selectArticle(articleMutations) {
-        let [[article]] = articleMutations
-            .filter(m => m.addedNodes[0] && m.addedNodes[0].nodeName === 'ARTICLE')
-            .map(m => m.addedNodes)
-        return article
+        // let [[article]] = articleMutations
+        //     .filter(m => m.addedNodes[0] && m.addedNodes[0].nodeName === 'ARTICLE')
+        //     .map(m => m.addedNodes)
+        return articleMutations.target.querySelector('article.M9sTE')
     }
 
     function getShortCode(article) {
         //console.log(article)
-        return article.querySelector('.c-Yi7').href.split('/').slice(-2,-1).pop()
+        let link = article.querySelector('.c-Yi7')
+        return link && link.href.split('/').slice(-2,-1).pop()
     }
 
     function requrestLikesCount(shortcode) {
