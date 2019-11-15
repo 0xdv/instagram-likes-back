@@ -2,6 +2,7 @@
 See likes in Instagram again
 
 [Instagram’s test to hide like counts expands to the US and across the globe](https://www.theverge.com/2019/11/14/20964865/instagram-test-hide-like-counts-expands-us-globally)
+
 Fortunatelly, they hide it only on front-end right now. So it's easy to show it with userscript.
 
 ⚠️ right now it works only when you open the post
