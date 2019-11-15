@@ -15,44 +15,40 @@
         let articleMutations = Array.prototype.filter.call(mutations, m => m.target.className === 'PdwC2 _6oveC Z_y-9')
         if (articleMutations.length === 0) return
 
-        console.log(articleMutations)
-        let [[article]] = articleMutations
-            .filter(m => m.addedNodes[0] && m.addedNodes[0].nodeName === 'ARTICLE')
-            .map(m => m.addedNodes)
-            console.log(article)
-        if(!article) return
+        let article = selectArticle(articleMutations)
+        if (!article) return
 
         let shortCode = getShortCode(article)
-        likesCount(shortCode)
-        .then(d => {
-            console.log(d)
+
+        requrestLikesCount(shortCode)
+        .then(likes => {
+            injectLikesValue(article, likes)
         })
         .catch(err => {
-            console.err(err)
+            console.error(err)
         })
-
-        //getshortcode
-        //get likes by shortcode
-        //inject value to article
-
-
-
     }).observe(document.body, {
         subtree: true,
         childList: true,
     })
 
+    function selectArticle(articleMutations) {
+        let [[article]] = articleMutations
+            .filter(m => m.addedNodes[0] && m.addedNodes[0].nodeName === 'ARTICLE')
+            .map(m => m.addedNodes)
+        return article
+    }
+
     function getShortCode(article) {
-        console.log(article)
+        //console.log(article)
         return article.querySelector('.c-Yi7').href.split('/').slice(-2,-1).pop()
     }
 
-    function likesCount(shortcode) {
+    function requrestLikesCount(shortcode) {
         return postData(shortcode)
         .then(resp => {
             return resp.data.shortcode_media.edge_media_preview_like.count
         })
-
     }
 
     function postData(shortcode) {
@@ -75,4 +71,18 @@
         
         return fetch(`${url}?${query}`).then(r => r.json())
     }
+
+    function injectLikesValue(article, likes) {
+        let likesSection = findInjectionPlace(article)
+        let btn = likesSection.querySelector('button')
+        btn.textContent = `${Number(likes).toLocaleString()} likes`
+        likesSection.innerHTML = ""
+        likesSection.appendChild(btn)
+    }
+
+    function findInjectionPlace(article) {
+        // img or video
+        return article.querySelector('.Nm9Fw, .HbPOm._9Ytll')
+    }
+
 })()
