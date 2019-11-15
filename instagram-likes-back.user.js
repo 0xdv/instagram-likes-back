@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         instagram-likes-back
+// @name         Instagram Likes Back
 // @namespace    instagram-likes-back
 // @version      0.0.1
 // @description  See likes in Instagram again
