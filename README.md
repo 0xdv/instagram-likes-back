@@ -6,8 +6,6 @@ See likes in Instagram again
 Fortunatelly, they hide it only on front-end right now. So it's easy to show it with userscript.
 Also, it's higly likely Instagram will hide likes count on back-end as well, so maybe the script get broken. Don't judge 😩
 
-⚠️ right now it works only when you open the post
-
 TODO:
 1. show likes on hover for grid
 2. ~~show likes in feed~~ ✅
