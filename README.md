@@ -10,7 +10,7 @@ Also, it's higly likely Instagram will hide likes count on back-end as well, so 
 
 TODO:
 1. show likes on hover for grid
-2. show likes in feed
+2. ~~show likes in feed~~ ✅
 
 ## Demo
 
