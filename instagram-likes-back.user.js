@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Instagram Likes Back
 // @namespace    instagram-likes-back
-// @version      0.0.3
+// @version      0.0.4
 // @description  See likes in Instagram again
 // @homepageURL  https://github.com/0xC0FFEEC0DE/instagram-likes-back
 // @supportURL   https://github.com/0xC0FFEEC0DE/instagram-likes-back/issues
@@ -15,21 +15,38 @@
 (function() {
     'use strict'
 
+    setTimeout(() => {
+        let firstArticles = document.querySelectorAll('article')
+        console.log(firstArticles)
+        firstArticles.forEach(process)
+    }, 1000)
+
     let articleObserver = new MutationObserver(function(mutations) {
         //console.log(mutations)
-        let mutation = Array.prototype.filter.call(mutations, m => m.target.className === 'PdwC2 _6oveC Z_y-9')[0]
 
-        if (!mutation) {
+        let article = (() => {
+            // on post open
+            let mutation = Array.prototype.filter.call(mutations, m => m.target.className === 'PdwC2 _6oveC Z_y-9')[0]
+            return mutation && selectArticle(mutation)
+        })()
+
+        article = article || (() => {
+            // on feed scroll
+            let t = Array.prototype.filter.call(mutations, m => m.target.nodeName === 'DIV')
+                .filter(m => m.addedNodes[0] && m.addedNodes[0].nodeName === 'ARTICLE')
+            return t[0] && t[0].addedNodes[0]
+        })()
+
+        article = article || (() => {
+            // post re-open
             let t = Array.prototype.filter.call(mutations, m => m.target.nodeName === 'BODY')
                 .filter(m => m.addedNodes[0] && m.addedNodes[0].className === '_2dDPU vCf6V')
-            mutation = t[0] || null
-        }
+            return t[0] && selectArticle(t[0])
+        })()
 
-        if (!mutation) return
-        let article = selectArticle(mutation)
-        if (article) {
-            process(article)
-        }
+        if (!article) return
+        process(article)
+
     }).observe(document.body, {
         subtree: true,
         childList: true,
@@ -49,9 +66,6 @@
     }
 
     function selectArticle(articleMutations) {
-        // let [[article]] = articleMutations
-        //     .filter(m => m.addedNodes[0] && m.addedNodes[0].nodeName === 'ARTICLE')
-        //     .map(m => m.addedNodes)
         return articleMutations.target.querySelector('article.M9sTE')
     }
 
@@ -91,7 +105,10 @@
 
     function injectLikesValue(article, likes) {
         let likesSection = findInjectionPlace(article)
+        
         let btn = likesSection.querySelector('button')
+        if (!btn) return // no likes
+
         btn.textContent = `${Number(likes).toLocaleString()} likes`
         likesSection.innerHTML = ""
         likesSection.appendChild(btn)
