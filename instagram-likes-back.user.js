@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Instagram Likes Back
 // @namespace    instagram-likes-back
-// @version      0.0.4
+// @version      0.0.5
 // @description  See likes in Instagram again
 // @homepageURL  https://github.com/0xC0FFEEC0DE/instagram-likes-back
 // @supportURL   https://github.com/0xC0FFEEC0DE/instagram-likes-back/issues
@@ -17,29 +17,38 @@
 
     setTimeout(() => {
         let firstArticles = document.querySelectorAll('article')
-        console.log(firstArticles)
+        //console.log(firstArticles)
         firstArticles.forEach(process)
     }, 1000)
 
     let articleObserver = new MutationObserver(function(mutations) {
         //console.log(mutations)
+        mutations = Array.from(mutations)
+
+        // like
+        let m = mutations.find(m => m.target.className === 'ltpMr Slqrh' && m.addedNodes[0])
+        if (m) {
+            return setTimeout(() => {
+                process(m.target.closest('article'))
+            }, 1000) // need some delay to update data on server
+        }
 
         let article = (() => {
             // on post open
-            let mutation = Array.prototype.filter.call(mutations, m => m.target.className === 'PdwC2 _6oveC Z_y-9')[0]
+            let mutation = mutations.filter(m => m.target.className === 'PdwC2 _6oveC Z_y-9')[0]
             return mutation && selectArticle(mutation)
         })()
 
         article = article || (() => {
             // on feed scroll
-            let t = Array.prototype.filter.call(mutations, m => m.target.nodeName === 'DIV')
+            let t = mutations.filter(m => m.target.nodeName === 'DIV')
                 .filter(m => m.addedNodes[0] && m.addedNodes[0].nodeName === 'ARTICLE')
             return t[0] && t[0].addedNodes[0]
         })()
 
         article = article || (() => {
             // post re-open
-            let t = Array.prototype.filter.call(mutations, m => m.target.nodeName === 'BODY')
+            let t = mutations.filter(m => m.target.nodeName === 'BODY')
                 .filter(m => m.addedNodes[0] && m.addedNodes[0].className === '_2dDPU vCf6V')
             return t[0] && selectArticle(t[0])
         })()
@@ -89,9 +98,9 @@
             'query_hash': 'fead941d698dc1160a298ba7bec277ac',
             'variables': JSON.stringify({
                 "shortcode": shortcode,
-                "child_comment_count": 3,
-                "fetch_comment_count": 40,
-                "parent_comment_count": 24,
+                "child_comment_count": 0,
+                "fetch_comment_count": 0,
+                "parent_comment_count": 0,
                 "has_threaded_comments": true
             })
         }
