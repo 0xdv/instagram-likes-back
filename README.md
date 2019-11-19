@@ -17,4 +17,4 @@ TODO:
 | ![](https://i.imgur.com/E00v5es.png) | ![](https://i.imgur.com/blZpxWF.png) |
 
 ## Installation
-https://raw.githubusercontent.com/0xC0FFEEC0DE/instagram-likes-back/master/instagram-likes-back.user.js
+https://raw.githubusercontent.com/0xdv/instagram-likes-back/master/instagram-likes-back.user.js
