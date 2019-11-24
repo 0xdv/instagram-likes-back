@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Instagram Likes Back
 // @namespace    instagram-likes-back
-// @version      0.0.5
+// @version      0.1.0
 // @description  See likes in Instagram again
 // @homepageURL  https://github.com/0xdv/instagram-likes-back
 // @supportURL   https://github.com/0xdv/instagram-likes-back/issues
@@ -12,8 +12,68 @@
 // @license      MIT
 // ==/UserScript==
 
-(function() {
+(function(window) {
     'use strict'
+
+    const GRID_POST_DATA = '2c5d4d8b70cad329c4a6ebe3abb6eedd'
+    const POST_DATA = 'fead941d698dc1160a298ba7bec277ac'
+
+    let likeCache = {}
+
+    // intercept api calls to retreive likes data from responses
+    // it should reduce extra requests (ig have pretty strict rate limits)
+    ;(function ApiInterceptor(window, onLoad) {
+        const realFetch = window.fetch
+        const realXHRsend = XMLHttpRequest.prototype.send
+        const realXHRopen = XMLHttpRequest.prototype.open
+
+        // intercept fetch
+        // window.fetch = function() {
+        //     let promise = realFetch.apply(this, arguments)
+        //     promise.then(onLoad)
+        //     return promise
+        // }
+
+        // intercept XHR
+        XMLHttpRequest.prototype.open = function(method, url) {
+            this._method = method
+            this._url = url
+            realXHRopen.apply(this, arguments)
+        }
+        XMLHttpRequest.prototype.send = function() {
+            this.addEventListener('load', function() {
+                //console.log('inter')
+                //console.log(this.responseText)
+                onLoad(this)
+            })
+            
+            realXHRsend.apply(this, arguments)
+        }
+    })(window, (res) => {
+        let m = res._url.match(/query_hash=(.*)&/)
+        if(!m) return
+
+        let queryHash = m[1]
+        if(queryHash !== GRID_POST_DATA) return
+
+        console.log('intersepted')
+        //console.log(res.responseText)
+        let gridData = JSON.parse(res.responseText)
+        let posts = gridData.data.user.edge_owner_to_timeline_media.edges
+        console.log(posts)
+        posts.forEach(p => {
+            let countInfo = {
+                shortcode: p.node.shortcode,
+                likes: p.node.edge_media_preview_like.count,
+                comments: p.node.edge_media_to_comment.count,
+                timestamp: Date.now(),
+            }
+
+            likeCache[countInfo.shortcode] = countInfo
+        })
+        console.log(likeCache)
+    })
+
 
     setTimeout(() => {
         let firstArticles = document.querySelectorAll('article')
@@ -65,7 +125,7 @@
         let shortCode = getShortCode(article)
         if (!shortCode) return
 
-        requrestLikesCount(shortCode)
+        getLikesCount(shortCode)
         .then(likes => {
             injectLikesValue(article, likes)
         })
@@ -84,6 +144,10 @@
         return link && link.href.split('/').slice(-2,-1).pop()
     }
 
+    function getLikesCount(shortcode) {
+        return likeCache[shortcode] ? Promise.resolve(likeCache[shortcode].likes) : requrestLikesCount(shortcode)
+    }
+
     function requrestLikesCount(shortcode) {
         return postData(shortcode)
         .then(resp => {
@@ -95,7 +159,7 @@
         const url = '/graphql/query/'
 
         let params = {
-            'query_hash': 'fead941d698dc1160a298ba7bec277ac',
+            'query_hash': POST_DATA,
             'variables': JSON.stringify({
                 "shortcode": shortcode,
                 "child_comment_count": 0,
@@ -128,4 +192,4 @@
         return article.querySelector('.Nm9Fw, .HbPOm._9Ytll')
     }
 
-})()
+})(window)
