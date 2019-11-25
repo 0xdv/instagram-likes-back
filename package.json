@@ -1,0 +1,8 @@
+{
+    "name": "instagram-likes-back",
+    "private": true,
+    "scripts": {},
+    "devDependencies": {
+        "@0xdv/webpack-userscript": "^2.3.1"
+    }
+}
