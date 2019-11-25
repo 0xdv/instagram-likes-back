@@ -1,41 +1,16 @@
+import {intercept} from './api-interceptor'
+import {requrestLikesCount} from './request-likes'
+
 (function(window) {
     'use strict'
 
     const GRID_POST_DATA = '2c5d4d8b70cad329c4a6ebe3abb6eedd'
-    const POST_DATA = 'fead941d698dc1160a298ba7bec277ac'
 
     let likeCache = {}
 
     // intercept api calls to retreive likes data from responses
     // it should reduce extra requests (ig have pretty strict rate limits)
-    ;(function ApiInterceptor(window, onLoad) {
-        const realFetch = window.fetch
-        const realXHRsend = XMLHttpRequest.prototype.send
-        const realXHRopen = XMLHttpRequest.prototype.open
-
-        // intercept fetch
-        // window.fetch = function() {
-        //     let promise = realFetch.apply(this, arguments)
-        //     promise.then(onLoad)
-        //     return promise
-        // }
-
-        // intercept XHR
-        XMLHttpRequest.prototype.open = function(method, url) {
-            this._method = method
-            this._url = url
-            realXHRopen.apply(this, arguments)
-        }
-        XMLHttpRequest.prototype.send = function() {
-            this.addEventListener('load', function() {
-                //console.log('inter')
-                //console.log(this.responseText)
-                onLoad(this)
-            })
-            
-            realXHRsend.apply(this, arguments)
-        }
-    })(window, (res) => {
+    intercept(window, (res) => {
         let m = res._url.match(/query_hash=(.*)&/)
         if(!m) return
 
@@ -59,7 +34,6 @@
         })
         console.log(likeCache)
     })
-
 
     setTimeout(() => {
         let firstArticles = document.querySelectorAll('article')
@@ -132,34 +106,6 @@
 
     function getLikesCount(shortcode) {
         return likeCache[shortcode] ? Promise.resolve(likeCache[shortcode].likes) : requrestLikesCount(shortcode)
-    }
-
-    function requrestLikesCount(shortcode) {
-        return postData(shortcode)
-        .then(resp => {
-            return resp.data.shortcode_media.edge_media_preview_like.count
-        })
-    }
-
-    function postData(shortcode) {
-        const url = '/graphql/query/'
-
-        let params = {
-            'query_hash': POST_DATA,
-            'variables': JSON.stringify({
-                "shortcode": shortcode,
-                "child_comment_count": 0,
-                "fetch_comment_count": 0,
-                "parent_comment_count": 0,
-                "has_threaded_comments": true
-            })
-        }
-
-        var query = Object.keys(params)
-            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-            .join('&')
-        
-        return fetch(`${url}?${query}`).then(r => r.json())
     }
 
     function injectLikesValue(article, likes) {
