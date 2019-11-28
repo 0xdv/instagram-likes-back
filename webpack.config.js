@@ -5,7 +5,8 @@ const fs = require('fs')
 module.exports = {
     entry: './src/index.js',
     output: {
-        filename: 'instagram-likes-back.user.js'
+        filename: 'instagram-likes-back.user.js',
+        path: __dirname
     },
     mode: 'production',
     plugins: [
@@ -15,7 +16,7 @@ module.exports = {
         })
     ],
     optimization: {
-        minimize: false,
+        minimize: true,
         minimizer: [
             new TerserPlugin({
                 sourceMap: false,
