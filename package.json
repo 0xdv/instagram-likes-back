@@ -3,6 +3,8 @@
     "private": true,
     "scripts": {},
     "devDependencies": {
-        "@0xdv/webpack-userscript": "^2.3.1"
+        "@0xdv/webpack-userscript": "^2.3.1",
+        "terser-webpack-plugin": "^2.2.1",
+        "webpack": "^4.41.2"
     }
 }

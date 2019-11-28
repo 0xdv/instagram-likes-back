@@ -1,8 +1,9 @@
-const WebpackUserscript = require('0xdv/webpack-userscript')
+const WebpackUserscript = require('@0xdv/webpack-userscript')
+const TerserPlugin = require('terser-webpack-plugin')
 const fs = require('fs')
 
 module.exports = {
-    entry: './src/instagram-likes-back.user.js',
+    entry: './src/index.js',
     output: {
         filename: 'instagram-likes-back.user.js'
     },
@@ -12,5 +13,18 @@ module.exports = {
             metajs: false,
             rawHeaderString: fs.readFileSync('./src/headers.js', 'utf8')
         })
-    ]
+    ],
+    optimization: {
+        minimize: false,
+        minimizer: [
+            new TerserPlugin({
+                sourceMap: false,
+                terserOptions: {
+                    compress: {
+                        drop_console: true,
+                    }
+                }
+            })
+        ]
+    }
 }

@@ -1,11 +1,33 @@
-export function requrestLikesCount(shortcode) {
+import {likeCache} from './like-cache'
+
+const POST_DATA = 'fead941d698dc1160a298ba7bec277ac'
+
+export function requestLikesCount(shortcode, noCache) {
+    let cached = !noCache && likeCache.get(shortcode)
+    if (cached) {
+        console.log('found in cache')
+        return Promise.resolve(cached.likes)
+    }
+
+    console.log('no cache', shortcode)
     return postData(shortcode)
-            .then(resp => {
-                return resp.data.shortcode_media.edge_media_preview_like.count
+            .then(cacheResult)
+            .then(d => {
+                return d.likes
             })
 }
 
-const POST_DATA = 'fead941d698dc1160a298ba7bec277ac'
+export function requestPostInfo(shortcode) {
+    let cached = likeCache.get(shortcode)
+    if(cached) {
+        console.log('from cache')
+        return Promise.resolve(cached)
+    }
+
+    console.log('no cache', shortcode)
+    return postData(shortcode)
+            .then(cacheResult)
+}
 
 function postData(shortcode) {
     const url = '/graphql/query/'
@@ -26,4 +48,15 @@ function postData(shortcode) {
         .join('&')
     
     return fetch(`${url}?${query}`).then(r => r.json())
+}
+
+function cacheResult(res) {
+    let postData = res.data.shortcode_media
+    let data = {
+        shortcode: postData.shortcode,
+        likes: postData.edge_media_preview_like.count,
+        comments: postData.edge_media_to_parent_comment.count,
+    }
+    likeCache.push(data)
+    return data
 }

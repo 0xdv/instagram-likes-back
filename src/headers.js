@@ -9,5 +9,6 @@
 // @updateURL    https://raw.githubusercontent.com/0xdv/instagram-likes-back/master/instagram-likes-back.user.js
 // @author       0xC0FFEEC0DE
 // @include      https://*.instagram.com/*
+// @grant        none
 // @license      MIT
 // ==/UserScript==
