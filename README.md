@@ -10,11 +10,18 @@ TODO:
 1. ~~show likes on hover for grid~~ ✅
 2. ~~show likes in feed~~ ✅
 
+## Installation
+https://raw.githubusercontent.com/0xdv/instagram-likes-back/master/instagram-likes-back.user.js
+
+
 ## Demo
 
 | Before | After |
 |-|-|
 | ![](https://i.imgur.com/E00v5es.png) | ![](https://i.imgur.com/blZpxWF.png) |
 
-## Installation
-https://raw.githubusercontent.com/0xdv/instagram-likes-back/master/instagram-likes-back.user.js
+Now works on grids as well!
+![](https://i.imgur.com/dZHYqTQ.png)
+
+## See all my IG userscripts 
+https://openuserjs.org/users/0xC0FFEEC0DE/scripts
