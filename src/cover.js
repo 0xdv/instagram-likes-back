@@ -24,7 +24,8 @@ export function showCover(item) {
 }
 
 export function hideCover(item) {
-    item.querySelector('.cover').style.display = 'none'
+    let cover = item.querySelector('.cover')
+    cover && (cover.style.display = 'none')
 }
 
 function drawCover() {
