@@ -14,7 +14,7 @@ export function addCover(item) {
     })(a)
     requestPostInfo(shortcode)
     .then(postInfo => {
-        likesSpan.textContent = postInfo.likes
+        likesSpan.textContent = postInfo.likes.toLocaleString()
         commSpan.textContent = postInfo.comments
     })
 }
