@@ -1,6 +1,6 @@
 import {requestLikesCount} from './request-likes'
 
-export function handleFirstArticled(articles) {
+export function handleFirstArticle(articles) {
     articles.forEach(process)
 }
 
@@ -71,8 +71,8 @@ function injectLikesValue(article, likes) {
     if (!btn) return // no likes
 
     btn.textContent = `${Number(likes).toLocaleString()} likes`
-    likesSection.innerHTML = ""
-    likesSection.appendChild(btn)
+    //likesSection.innerHTML = ""
+    //likesSection.appendChild(btn)
 }
 
 function findInjectionPlace(article) {

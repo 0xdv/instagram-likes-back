@@ -1,6 +1,6 @@
 import {likeCache} from './like-cache'
 import {intercept} from './api-interceptor'
-import {handleFirstArticled, handleArticleMutations} from './article-observer';
+import {handleFirstArticle, handleArticleMutations} from './article-observer';
 import {handleFirstGrid, handleGridMutations} from './grid-observer';
 
 (function(window) {
@@ -19,28 +19,29 @@ import {handleFirstGrid, handleGridMutations} from './grid-observer';
         if(!m) return
 
         let queryHash = m[1]
-        if(queryHash === GRID_POST_DATA) {
-            let gridData = JSON.parse(res.responseText)
-            let posts = gridData.data.user.edge_owner_to_timeline_media.edges
-            //console.log(posts)
-            posts.forEach(p => {
-                likeCache.push({
-                    shortcode: p.node.shortcode,
-                    likes: p.node.edge_media_preview_like.count,
-                    comments: p.node.edge_media_to_comment.count,
-                })
-            })
-        } else if (queryHash === FEED_DATA) {
-            let feedData = JSON.parse(res.responseText)
-            let posts = feedData.data.user.edge_web_feed_timeline.edges
-            posts.forEach(p => {
-                likeCache.push({
-                    shortcode: p.node.shortcode,
-                    likes: p.node.edge_media_preview_like.count,
-                    comments: p.node.edge_media_preview_comment.count,
-                })
-            })
-        } else if (queryHash === PROFILE_DATA) {
+        // if(queryHash === GRID_POST_DATA) {
+        //     let gridData = JSON.parse(res.responseText)
+        //     let posts = gridData.data.user.edge_owner_to_timeline_media.edges
+        //     //console.log(posts)
+        //     posts.forEach(p => {
+        //         likeCache.push({
+        //             shortcode: p.node.shortcode,
+        //             likes: p.node.edge_media_preview_like.count,
+        //             comments: p.node.edge_media_to_comment.count,
+        //         })
+        //     })
+        // } else if (queryHash === FEED_DATA) {
+        //     let feedData = JSON.parse(res.responseText)
+        //     let posts = feedData.data.user.edge_web_feed_timeline.edges
+        //     posts.forEach(p => {
+        //         likeCache.push({
+        //             shortcode: p.node.shortcode,
+        //             likes: p.node.edge_media_preview_like.count,
+        //             comments: p.node.edge_media_preview_comment.count,
+        //         })
+        //     })
+        // } else 
+        if (queryHash === PROFILE_DATA) {
             let grid = Array.from(document.querySelectorAll('.v1Nh3.kIKUG._bz0w'))
             handleFirstGrid(grid)
         }
@@ -49,7 +50,7 @@ import {handleFirstGrid, handleGridMutations} from './grid-observer';
     setTimeout(() => {
         let firstArticles = document.querySelectorAll('article')
         //console.log(firstArticles)
-        handleFirstArticled(firstArticles)
+        handleFirstArticle(firstArticles)
 
         let grid = Array.from(document.querySelectorAll('.v1Nh3.kIKUG._bz0w'))
         handleFirstGrid(grid)
