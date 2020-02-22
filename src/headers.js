@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Instagram Likes Back
 // @namespace    instagram-likes-back
-// @version      0.1.3
+// @version      0.1.4
 // @description  See likes in Instagram again
 // @homepageURL  https://github.com/0xdv/instagram-likes-back
 // @supportURL   https://github.com/0xdv/instagram-likes-back/issues

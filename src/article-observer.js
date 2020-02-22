@@ -77,5 +77,33 @@ function injectLikesValue(article, likes) {
 
 function findInjectionPlace(article) {
     // img or video
-    return article.querySelector('.Nm9Fw, .HbPOm._9Ytll')
+    let div = article.querySelector('.Nm9Fw, .HbPOm._9Ytll')
+
+    if (!div) { // ig hides section, need to re-create 
+        div = addLikesSection(article)
+    }
+    return div
+}
+
+function addLikesSection(article) {
+    let buttonBar = article.querySelector('.ltpMr.Slqrh')
+    let section = document.createElement('section')
+    section.className = 'EDfFK ygqzn'
+
+    let div = document.createElement('div')
+    div.className = 'Igw0E IwRSH eGOV_ ybXk5 vwCYk'
+
+    let innerDiv = document.createElement('div')
+    innerDiv.className = 'Nm9Fw'
+
+    let button = document.createElement('button')
+    button.className = 'sqdOP yWX7d _8A5w5'
+    button.type = 'button'
+
+    buttonBar.parentNode.insertBefore(section, buttonBar.nextSibling);
+    section.appendChild(div)
+    div.appendChild(innerDiv)
+    innerDiv.appendChild(button)
+
+    return innerDiv
 }

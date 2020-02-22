@@ -1,6 +1,9 @@
 import {likeCache} from './like-cache'
 
+const url = '/graphql/query/'
+
 const POST_DATA = 'fead941d698dc1160a298ba7bec277ac'
+const LIKES_LIST = 'd5d763b1e2acf209d62d22d184488e57'
 
 export function requestLikesCount(shortcode, noCache) {
     let cached = !noCache && likeCache.get(shortcode)
@@ -30,8 +33,6 @@ export function requestPostInfo(shortcode) {
 }
 
 function postData(shortcode) {
-    const url = '/graphql/query/'
-
     let params = {
         'query_hash': POST_DATA,
         'variables': JSON.stringify({
@@ -47,7 +48,21 @@ function postData(shortcode) {
         .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
         .join('&')
     
-    return fetch(`${url}?${query}`).then(r => r.json())
+    return fetch(`${url}?${query}`)
+        .then(r => r.json())
+        .then(res => {
+            if (res.data.shortcode_media.edge_media_preview_like.count === -1) {
+                console.log('need extra query')
+                return likesList(res.data.shortcode_media.shortcode)
+                .then(llRes => {
+                    res.data.shortcode_media.edge_media_preview_like.count = llRes.data.shortcode_media.edge_liked_by.count
+                    return res
+                })
+            } else {
+                return Promise.resolve(res)
+            }
+
+        })
 }
 
 function cacheResult(res) {
@@ -59,4 +74,22 @@ function cacheResult(res) {
     }
     likeCache.push(data)
     return data
+}
+
+function likesList(shortcode) {
+    let params = {
+        'query_hash': LIKES_LIST,
+        'variables': JSON.stringify({
+            "shortcode": shortcode,
+            "include_reel": true,
+            "first": 1,
+        })
+    }
+
+    var query = Object.keys(params)
+        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+        .join('&')
+    
+    return fetch(`${url}?${query}`)
+        .then(r => r.json())
 }
